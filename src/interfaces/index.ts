@@ -314,6 +314,7 @@ export type RawDecodedLog = {
         type: string
         value: string | string[]
     }[]
+    decoded: boolean
 }
 
 export type RawDecodedCallData = {

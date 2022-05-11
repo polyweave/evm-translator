@@ -227,6 +227,7 @@ class Translator2 {
                 ...log,
                 logIndex: logs[index].logIndex,
                 address: validateAndNormalizeAddress(log.address),
+                decoded: true,
             }
             return decodedLog
         }) as RawDecodedLog[]
