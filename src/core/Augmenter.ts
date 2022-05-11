@@ -124,7 +124,7 @@ export class Augmenter {
             gasUsed: txReceipt.gasUsed.toString(),
             timestamp: txReceipt.timestamp,
             txIndex: txReceipt.transactionIndex,
-            reverted: txReceipt.status == 0,
+            reverted: txReceipt.status == 0, // will return true if status==undefined
             fromENS: null,
             toENS: null,
         }

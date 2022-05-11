@@ -130,7 +130,7 @@ class Interpreter {
             gasPaid: gasUsed,
             extra: {},
             exampleDescription: 'no example description defined',
-            reverted: !!decodedData.reverted,
+            reverted: decodedData.reverted ? true : null,
             contractName: null,
             counterpartyName: null,
         }

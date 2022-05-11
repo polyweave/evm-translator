@@ -167,7 +167,7 @@ export type Decoded = {
     txIndex: number
     fromAddress: Address
     toAddress: Address | null
-    reverted?: boolean
+    reverted: boolean
     timestamp: number | null
     gasUsed: string
     effectiveGasPrice: string | null
@@ -236,7 +236,8 @@ export type Interpretation = {
     userName: string
     counterpartyName: string | null // the opposite side of the tx, opposite of userName
     extra: Record<string, any>
-    reverted: boolean
+    /* null when false so we can hide the null columns more easily */
+    reverted: true | null
     gasPaid: string
 }
 
