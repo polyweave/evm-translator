@@ -1,8 +1,17 @@
 import { Log } from '@ethersproject/providers'
 import collect from 'collect.js'
+import { Address } from 'eth-ens-namehash'
 import { ethers } from 'ethers'
 import { BigNumber } from 'ethers'
-import { ContractData, Interaction, TxReceipt } from 'interfaces'
+import {
+    ContractData,
+    DecodedCallData,
+    Interaction,
+    MostTypes,
+    RawDecodedCallData,
+    RawDecodedLog,
+    TxReceipt,
+} from 'interfaces'
 import { validateAndNormalizeAddress } from 'utils'
 
 // import { PrismaClient } from '@prisma/client'
@@ -17,37 +26,10 @@ type Event = {
     events: Record<string, unknown>
 }
 
-export type RawDecodedLog = {
-    name: string
-    address: string
-    logIndex: number
-    events: {
-        name: string
-        type: string
-        value: string | string[]
-    }[]
-}
-
-export type RawDecodedCallData = {
-    name: string
-    params: {
-        name: string
-        type: string
-        value: string | number | boolean | null | string[]
-    }[]
-}
-
-export type DecodedCallData = {
-    name: string
-    params: Record<string, MostTypes>
-}
-
-export type MostTypes = string | number | boolean | null | string[]
-
 export function transformDecodedLogs(
     rawLogs: Log[],
     decodedLogs: RawDecodedLog[],
-    contractDataArr: ContractData[],
+    contractDataMap: Record<Address, ContractData>,
 ): Array<Interaction> {
     // tx.log_events.forEach((event) => {
     //     console.log('decoded', event)
@@ -81,7 +63,7 @@ export function transformDecodedLogs(
             // console.log('event', event)
             // console.log('detials', details)
 
-            const contractData = contractDataArr.find((contractData) => contractData.address === log.address)
+            const contractData = contractDataMap[log.address as Address]
 
             return [
                 log.address,

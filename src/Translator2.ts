@@ -2,21 +2,24 @@ import { AlchemyProvider, JsonRpcProvider } from '@ethersproject/providers'
 import abiDecoder from 'abi-decoder'
 import { Augmenter } from 'core/Augmenter'
 import RawDataFetcher from 'core/RawDataFetcher'
-import { DecodedCallData, RawDecodedLog, transformDecodedData, transformDecodedLogs } from 'core/transformDecodedLogs'
+import { transformDecodedData, transformDecodedLogs } from 'core/transformDecodedLogs'
 import {
     Address,
     Chain,
     ContractData,
     ContractType,
     Decoded,
+    DecodedCallData,
     Interaction,
     Interpretation,
+    RawDecodedLog,
     RawTxData,
     RawTxDataWithoutTrace,
 } from 'interfaces'
 import { ABI_Item, ABI_ItemUnfiltered } from 'interfaces/abi'
 import { EVMTransaction } from 'interfaces/s3'
-import { filterABIs, getChainBySymbol, getKeys, validateAndNormalizeAddress } from 'utils'
+import traverse from 'traverse'
+import { filterABIs, getChainBySymbol, getKeys, isAddress, validateAndNormalizeAddress } from 'utils'
 import Etherscan from 'utils/clients/Etherscan'
 
 export type TranslatorConfigTwo = {
@@ -86,8 +89,8 @@ class Translator2 {
         return this.rawDataFetcher.getTxDataWithoutTrace(txHash)
     }
 
-    getRawDataFromS3Data(tx: EVMTransaction): RawTxDataWithoutTrace {
-        return this.rawDataFetcher.getTxDataFromS3Tx(tx)
+    getRawDataFromS3Data(tx: EVMTransaction, timestamp: number): RawTxDataWithoutTrace {
+        return this.rawDataFetcher.getTxDataFromS3Tx(tx, timestamp)
     }
 
     // Could rely on Etherscan, but they have a max of 10k records
@@ -105,6 +108,28 @@ class Translator2 {
         })
 
         return [...new Set(addresses)]
+    }
+
+    getAllAddresses(
+        decodedLogs: Interaction[],
+        decodedCallData: DecodedCallData,
+        contractAddresses: Address[],
+    ): Address[] {
+        const addresses: Address[] = []
+
+        traverse(decodedLogs).forEach(function (value: string) {
+            if (isAddress(value)) {
+                addresses.push(validateAndNormalizeAddress(value))
+            }
+        })
+
+        traverse(decodedCallData).forEach(function (value: string) {
+            if (isAddress(value)) {
+                addresses.push(validateAndNormalizeAddress(value))
+            }
+        })
+
+        return [...new Set([...addresses, ...contractAddresses])]
     }
 
     /**********************************************/
@@ -145,8 +170,8 @@ class Translator2 {
         throw new Error('Not implemented')
     }
 
-    async getEnsForAddresses(addresses: string[]): Promise<Record<Address, string>> {
-        throw new Error('Not implemented')
+    async getENSNames(addresses: Address[]): Promise<Record<Address, string>> {
+        return this.augmenter.getENSNames(addresses)
     }
 
     async getOfficialNamesForContracts(contractAddresses: string[]): Promise<Record<Address, string>> {
@@ -160,7 +185,7 @@ class Translator2 {
     async getContractsData(
         contractToAbiMap: Record<Address, ABI_ItemUnfiltered[]>,
         contractToOfficialNameMap: Record<Address, string | null>,
-    ): Promise<ContractData[]> {
+    ): Promise<Record<Address, ContractData>> {
         return this.augmenter.getContractsData(contractToAbiMap, contractToOfficialNameMap)
     }
 
@@ -178,7 +203,7 @@ class Translator2 {
     decodeTxData(
         rawTxData: RawTxData | RawTxDataWithoutTrace,
         ABIs: Record<Address, ABI_Item[]>,
-        contractDataArr: ContractData[],
+        contractDataMap: Record<Address, ContractData>,
     ): { decodedLogs: Interaction[]; decodedCallData: DecodedCallData } {
         const allABIs = []
         for (const abis of Object.values(ABIs)) {
@@ -203,7 +228,7 @@ class Translator2 {
             return decodedLog
         }) as RawDecodedLog[]
 
-        const decodedLogs = transformDecodedLogs(rawTxData.txReceipt.logs, augmentedDecodedLogs, contractDataArr)
+        const decodedLogs = transformDecodedLogs(rawTxData.txReceipt.logs, augmentedDecodedLogs, contractDataMap)
         const decodedCallData = transformDecodedData(rawDecodedCallData)
 
         return { decodedLogs, decodedCallData }
@@ -214,13 +239,13 @@ class Translator2 {
     }
 
     augmentDecodedData(
-        decodedData: { decodedLogs: Interaction[]; decodedCallData: DecodedCallData },
-        ens: Record<Address, string>,
-        namesAndSymbolsMap: NamesAndSymbolsMap,
-        officialContractNamesMap: Record<Address, string>,
-        contractTypesMap: Record<Address, ContractType>,
+        decodedLogs: Interaction[],
+        decodedCallData: DecodedCallData,
+        ensMap: Record<Address, string>,
+        contractDataMap: Record<Address, ContractData>,
+        rawTxData: RawTxData | RawTxDataWithoutTrace,
     ): Decoded {
-        throw new Error('Not implemented')
+        return this.augmenter.augmentDecodedData(decodedLogs, decodedCallData, ensMap, contractDataMap, rawTxData)
     }
 
     //This is a subset of augmentDecodedData
@@ -244,20 +269,18 @@ class Translator2 {
     async interpretTx(txHash: string, userAddress: Address | null = null): Promise<Interpretation> {
         const rawTxData = await this.getRawTxData(txHash)
         const addresses = this.getContractAddressesFromRawTxData(rawTxData)
-        const unfilteredAbiMap = await this.getABIsForContracts(addresses)
+        const [unfilteredAbiMap, officialContractNamesMap] = await this.getABIsAndNamesForContracts(addresses)
         const AbiMap = filterABIs(unfilteredAbiMap)
-        const ENSs = await this.getEnsForAddresses(addresses)
-        const nameAndSymbols = await this.getNamesAndSymbols(addresses)
-        const officialContractNames = await this.getOfficialNamesForContracts(addresses)
-        const contractTypesMap = await this.getContractTypes(AbiMap)
+        const ensMap = await this.getENSNames(addresses)
+        const contractDataMap = await this.getContractsData(AbiMap, officialContractNamesMap)
 
-        const decoded = this.decodeTxData(rawTxData, AbiMap, [])
+        const { decodedLogs, decodedCallData } = this.decodeTxData(rawTxData, AbiMap, contractDataMap)
         const decodedWithAugmentation = this.augmentDecodedData(
-            decoded,
-            ENSs,
-            nameAndSymbols,
-            officialContractNames,
-            contractTypesMap,
+            decodedLogs,
+            decodedCallData,
+            ensMap,
+            contractDataMap,
+            rawTxData,
         )
 
         const interpretation = this.interpretDecodedTx(decodedWithAugmentation, userAddress)
