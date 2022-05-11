@@ -1,8 +1,8 @@
 import { transformCovalentEvents } from './transformCovalentLogs'
+import { transformDecodedData, transformDecodedLogs } from './transformDecodedLogs'
 import { BaseProvider, Formatter } from '@ethersproject/providers'
-// import { normalize } from 'eth-ens-namehash'
-import { BigNumber, Contract } from 'ethers'
-import { formatEther, formatUnits } from 'ethers/lib/utils'
+import abiDecoder from 'abi-decoder'
+import { Contract } from 'ethers'
 import {
     Address,
     Chain,
@@ -13,12 +13,13 @@ import {
     InProgressActivity,
     Interaction,
     InteractionEvent,
+    RawDecodedLog,
     RawTxData,
     RawTxDataWithoutTrace,
     TraceLog,
     TxType,
 } from 'interfaces'
-import { ABI_ItemUnfiltered } from 'interfaces/abi'
+import { ABI_Item, ABI_ItemUnfiltered } from 'interfaces/abi'
 import { CovalentTxData } from 'interfaces/covalent'
 import traverse from 'traverse'
 import { filterABIs, getChainById, getKeys, isAddress, validateAndNormalizeAddress } from 'utils'
@@ -85,6 +86,41 @@ export class Augmenter {
         }
 
         return this.decodedArr
+    }
+
+    decodeTxData(
+        rawTxData: RawTxData | RawTxDataWithoutTrace,
+        ABIs: Record<Address, ABI_Item[]>,
+        contractDataMap: Record<Address, ContractData>,
+    ): { decodedLogs: Interaction[]; decodedCallData: DecodedCallData } {
+        const allABIs = []
+        for (const abis of Object.values(ABIs)) {
+            allABIs.push(...abis)
+        }
+        abiDecoder.addABI(allABIs)
+
+        const { txReceipt } = rawTxData
+        const { logs } = txReceipt
+
+        // TODO logs that don't get decoded dont show up as 'null' or 'undefined', which will throw off mapping the logIndex to the decoded log
+
+        const rawDecodedLogs = abiDecoder.decodeLogs(rawTxData.txReceipt.logs)
+        const rawDecodedCallData = abiDecoder.decodeMethod(rawTxData.txResponse.data) || { name: null, params: [] }
+
+        const augmentedDecodedLogs = rawDecodedLogs.map((log, index) => {
+            const decodedLog = {
+                ...log,
+                logIndex: logs[index].logIndex,
+                address: validateAndNormalizeAddress(log.address),
+                decoded: true,
+            }
+            return decodedLog
+        }) as RawDecodedLog[]
+
+        const decodedLogs = transformDecodedLogs(rawTxData.txReceipt.logs, augmentedDecodedLogs, contractDataMap)
+        const decodedCallData = transformDecodedData(rawDecodedCallData)
+
+        return { decodedLogs, decodedCallData }
     }
 
     augmentDecodedData(
@@ -482,5 +518,43 @@ export class Augmenter {
             }),
         )
         return contractDataMap
+    }
+
+    // TODO get the names
+    async getABIsAndNamesForContracts(
+        contractAddresses: string[],
+    ): Promise<[Record<Address, ABI_ItemUnfiltered[]>, Record<Address, string | null>]> {
+        const addresses = contractAddresses.map((a) => validateAndNormalizeAddress(a))
+        const abiMap = await this.etherscan.getABIs(addresses)
+
+        const nameMap: Record<Address, string | null> = {}
+
+        getKeys(abiMap).forEach((address) => {
+            nameMap[address] = null
+        })
+
+        return [abiMap, nameMap]
+    }
+
+    static getAllAddresses(
+        decodedLogs: Interaction[],
+        decodedCallData: DecodedCallData,
+        contractAddresses: Address[],
+    ): Address[] {
+        const addresses: Address[] = []
+
+        traverse(decodedLogs).forEach(function (value: string) {
+            if (isAddress(value)) {
+                addresses.push(validateAndNormalizeAddress(value))
+            }
+        })
+
+        traverse(decodedCallData).forEach(function (value: string) {
+            if (isAddress(value)) {
+                addresses.push(validateAndNormalizeAddress(value))
+            }
+        })
+
+        return [...new Set([...addresses, ...contractAddresses])]
     }
 }

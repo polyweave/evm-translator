@@ -1,9 +1,7 @@
-import { AlchemyProvider, JsonRpcProvider } from '@ethersproject/providers'
-import abiDecoder from 'abi-decoder'
+import { AlchemyProvider } from '@ethersproject/providers'
 import { Augmenter } from 'core/Augmenter'
 import Interpreter from 'core/Interpreter'
 import RawDataFetcher from 'core/RawDataFetcher'
-import { transformDecodedData, transformDecodedLogs } from 'core/transformDecodedLogs'
 import {
     Address,
     Chain,
@@ -13,14 +11,12 @@ import {
     DecodedCallData,
     Interaction,
     Interpretation,
-    RawDecodedLog,
     RawTxData,
     RawTxDataWithoutTrace,
 } from 'interfaces'
 import { ABI_Item, ABI_ItemUnfiltered } from 'interfaces/abi'
 import { EVMTransaction } from 'interfaces/s3'
-import traverse from 'traverse'
-import { filterABIs, getChainBySymbol, getKeys, isAddress, validateAndNormalizeAddress } from 'utils'
+import { filterABIs, validateAndNormalizeAddress } from 'utils'
 import Etherscan from 'utils/clients/Etherscan'
 
 export type TranslatorConfigTwo = {
@@ -102,15 +98,7 @@ class Translator2 {
     // }
 
     getContractAddressesFromRawTxData(rawTxData: RawTxData | RawTxDataWithoutTrace): Address[] {
-        const { txReceipt } = rawTxData
-        const addresses: Address[] = []
-        addresses.push(validateAndNormalizeAddress(txReceipt.to))
-
-        txReceipt.logs.forEach(({ address }) => {
-            addresses.push(validateAndNormalizeAddress(address))
-        })
-
-        return [...new Set(addresses)]
+        return RawDataFetcher.getContractAddressesFromRawTxData(rawTxData)
     }
 
     getAllAddresses(
@@ -118,48 +106,17 @@ class Translator2 {
         decodedCallData: DecodedCallData,
         contractAddresses: Address[],
     ): Address[] {
-        const addresses: Address[] = []
-
-        traverse(decodedLogs).forEach(function (value: string) {
-            if (isAddress(value)) {
-                addresses.push(validateAndNormalizeAddress(value))
-            }
-        })
-
-        traverse(decodedCallData).forEach(function (value: string) {
-            if (isAddress(value)) {
-                addresses.push(validateAndNormalizeAddress(value))
-            }
-        })
-
-        return [...new Set([...addresses, ...contractAddresses])]
+        return Augmenter.getAllAddresses(decodedLogs, decodedCallData, contractAddresses)
     }
 
     /**********************************************/
     /**** USING TX AND CONTRACT ADDRESSES  ********/
     /****  Data used to decode & augment   ********/
     /**********************************************/
-    async getABIsForContracts(contractAddresses: string[]): Promise<Record<Address, ABI_ItemUnfiltered[]>> {
-        const addresses = contractAddresses.map((a) => validateAndNormalizeAddress(a))
-        const abiMap = await this.etherscan.getABIs(addresses)
-
-        return abiMap
-    }
-
-    // TODO get the names
     async getABIsAndNamesForContracts(
         contractAddresses: string[],
     ): Promise<[Record<Address, ABI_ItemUnfiltered[]>, Record<Address, string | null>]> {
-        const addresses = contractAddresses.map((a) => validateAndNormalizeAddress(a))
-        const abiMap = await this.etherscan.getABIs(addresses)
-
-        const nameMap: Record<Address, string | null> = {}
-
-        getKeys(abiMap).forEach((address) => {
-            nameMap[address] = null
-        })
-
-        return [abiMap, nameMap]
+        return this.augmenter.getABIsAndNamesForContracts(contractAddresses)
     }
 
     async getNameAndSymbol(
@@ -167,10 +124,6 @@ class Translator2 {
         contractType: ContractType,
     ): Promise<{ tokenName: string | null; tokenSymbol: string | null; contractName: string | null }> {
         return this.augmenter.getNameAndSymbol(address, contractType)
-    }
-
-    async getNamesAndSymbols(contractAddresses: string[]): Promise<NamesAndSymbolsMap> {
-        throw new Error('Not implemented')
     }
 
     async getENSNames(addresses: Address[]): Promise<Record<Address, string>> {
@@ -208,34 +161,7 @@ class Translator2 {
         ABIs: Record<Address, ABI_Item[]>,
         contractDataMap: Record<Address, ContractData>,
     ): { decodedLogs: Interaction[]; decodedCallData: DecodedCallData } {
-        const allABIs = []
-        for (const abis of Object.values(ABIs)) {
-            allABIs.push(...abis)
-        }
-        abiDecoder.addABI(allABIs)
-
-        const { txReceipt } = rawTxData
-        const { logs } = txReceipt
-
-        // TODO logs that don't get decoded dont show up as 'null' or 'undefined', which will throw off mapping the logIndex to the decoded log
-
-        const rawDecodedLogs = abiDecoder.decodeLogs(rawTxData.txReceipt.logs)
-        const rawDecodedCallData = abiDecoder.decodeMethod(rawTxData.txResponse.data) || { name: null, params: [] }
-
-        const augmentedDecodedLogs = rawDecodedLogs.map((log, index) => {
-            const decodedLog = {
-                ...log,
-                logIndex: logs[index].logIndex,
-                address: validateAndNormalizeAddress(log.address),
-                decoded: true,
-            }
-            return decodedLog
-        }) as RawDecodedLog[]
-
-        const decodedLogs = transformDecodedLogs(rawTxData.txReceipt.logs, augmentedDecodedLogs, contractDataMap)
-        const decodedCallData = transformDecodedData(rawDecodedCallData)
-
-        return { decodedLogs, decodedCallData }
+        return this.decodeTxData(rawTxData, ABIs, contractDataMap)
     }
 
     decodeTxDataArr(rawTxDataArr: RawTxData[], ABIs: Record<Address, ABI_Item[]>[]): Decoded[] {

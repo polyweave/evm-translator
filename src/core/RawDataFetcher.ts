@@ -16,7 +16,7 @@ import {
 } from 'interfaces'
 import { CovalentTxData } from 'interfaces/covalent'
 import { EVMTransaction, EVMTransactionReceiptStringified, EVMTransactionStringified } from 'interfaces/s3'
-import { validateAddress } from 'utils'
+import { validateAddress, validateAndNormalizeAddress } from 'utils'
 import Covalent from 'utils/clients/Covalent'
 
 export default class RawDataFetcher {
@@ -141,6 +141,18 @@ export default class RawDataFetcher {
             rawTxDataArr,
             covalentTxDataArr,
         }
+    }
+
+    static getContractAddressesFromRawTxData(rawTxData: RawTxData | RawTxDataWithoutTrace): Address[] {
+        const { txReceipt } = rawTxData
+        const addresses: Address[] = []
+        addresses.push(validateAndNormalizeAddress(txReceipt.to))
+
+        txReceipt.logs.forEach(({ address }) => {
+            addresses.push(validateAndNormalizeAddress(address))
+        })
+
+        return [...new Set(addresses)]
     }
 }
 
