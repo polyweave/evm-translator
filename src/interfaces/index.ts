@@ -48,7 +48,11 @@ export const enum TxType {
 }
 
 export type TxResponse = Omit<unvalidatedTransactionResponse, 'from' | 'to'> & { from: Address; creates: string }
-export type TxReceipt = Omit<unvalidatedTransactionReceipt, 'from' | 'to'> & { from: Address; to: Address }
+export type TxReceipt = Omit<unvalidatedTransactionReceipt, 'from' | 'to'> & {
+    from: Address
+    to: Address
+    timestamp: number
+}
 
 export type UnvalidatedTraceLog = {
     action: UnvalidatedTraceLogAction
@@ -149,9 +153,10 @@ export type Decoded = {
     /** The type of contract. An ERC-xx, WETH, or  */
     contractType: ContractType
     /** the name of the function that initiated the transaction. If not decoded, null  */
-    contractMethod?: string | null
-    contractName?: string
-    officialContractName?: string | null
+    contractMethod: string | null
+    contractMethodArguments: Record<string, MostTypes>
+    contractName: string | null
+    officialContractName: string | null
     fromENS?: string | null
     toENS?: string | null
     interactions: Array<Interaction>
@@ -163,7 +168,7 @@ export type Decoded = {
     fromAddress: Address
     toAddress?: Address
     reverted?: boolean
-    timestamp?: string //
+    timestamp: number | null
     gasUsed?: string
     effectiveGasPrice?: string
 }
@@ -297,3 +302,30 @@ export type EthersAPIKeys = {
         applicationSecretKey: string
     }
 }
+
+export type RawDecodedLog = {
+    name: string
+    address: string
+    logIndex: number
+    events: {
+        name: string
+        type: string
+        value: string | string[]
+    }[]
+}
+
+export type RawDecodedCallData = {
+    name: string | null
+    params: {
+        name: string
+        type: string
+        value: string | number | boolean | null | string[]
+    }[]
+}
+
+export type DecodedCallData = {
+    name: string | null
+    params: Record<string, MostTypes>
+}
+
+export type MostTypes = string | number | boolean | null | string[]
