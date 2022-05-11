@@ -2,13 +2,20 @@ import { AlchemyProvider, JsonRpcProvider } from '@ethersproject/providers'
 import abiDecoder from 'abi-decoder'
 import { Augmenter } from 'core/Augmenter'
 import RawDataFetcher from 'core/RawDataFetcher'
-import { DecodedDataAndLogs, DecodedLog, transformDecodedLogs } from 'core/transformDecodedLogs'
+import {
+    DecodedCallData,
+    DecodedDataAndLogs,
+    RawDecodedLog,
+    transformDecodedData,
+    transformDecodedLogs,
+} from 'core/transformDecodedLogs'
 import {
     Address,
     Chain,
     ContractData,
     ContractType,
     Decoded,
+    Interaction,
     Interpretation,
     RawTxData,
     RawTxDataWithoutTrace,
@@ -171,8 +178,6 @@ class Translator2 {
     getContractTypes(contractToAbiMap: Record<Address, ABI_Item[]>): Promise<Record<Address, ContractType>> {
         throw new Error('Not implemented')
     }
-    // ... might not even needs this, oops
-
     /**********************************************/
     /******      DECODING / AUGMENTING     ********/
     /**********************************************/
@@ -180,7 +185,7 @@ class Translator2 {
         rawTxData: RawTxData | RawTxDataWithoutTrace,
         ABIs: Record<Address, ABI_Item[]>,
         contractDataArr: ContractData[],
-    ): any {
+    ): { decodedLogs: Interaction[]; decodedCallData: DecodedCallData } {
         const allABIs = []
         for (const abis of Object.values(ABIs)) {
             allABIs.push(...abis)
@@ -192,25 +197,22 @@ class Translator2 {
 
         // TODO logs that don't get decoded dont show up as 'null' or 'undefined', which will throw off mapping the logIndex to the decoded log
 
-        const decodedLogs: Omit<DecodedLog, 'logIndex'>[] = abiDecoder.decodeLogs(rawTxData.txReceipt.logs)
-        const decodedData = abiDecoder.decodeMethod(rawTxData.txResponse.data)
+        const rawDecodedLogs = abiDecoder.decodeLogs(rawTxData.txReceipt.logs)
+        const rawDecodedCallData = abiDecoder.decodeMethod(rawTxData.txResponse.data)
 
-        const augmentedDecodedLogs = decodedLogs.map((log, index) => {
+        const augmentedDecodedLogs = rawDecodedLogs.map((log, index) => {
             const decodedLog = {
                 ...log,
                 logIndex: logs[index].logIndex,
                 address: validateAndNormalizeAddress(log.address),
             }
             return decodedLog
-        }) as DecodedLog[]
+        }) as RawDecodedLog[]
 
-        const transformedDecodedLogs = transformDecodedLogs(
-            rawTxData.txReceipt.logs,
-            augmentedDecodedLogs,
-            contractDataArr,
-        )
+        const decodedLogs = transformDecodedLogs(rawTxData.txReceipt.logs, augmentedDecodedLogs, contractDataArr)
+        const decodedCallData = transformDecodedData(rawDecodedCallData)
 
-        return { decodedLogs, decodedData, transformedDecodedLogs }
+        return { decodedLogs, decodedCallData }
     }
 
     decodeTxDataArr(rawTxDataArr: RawTxData[], ABIs: Record<Address, ABI_Item[]>[]): Decoded[] {
@@ -218,7 +220,7 @@ class Translator2 {
     }
 
     augmentDecodedData(
-        decodedData: Decoded,
+        decodedData: { decodedLogs: Interaction[]; decodedCallData: DecodedCallData },
         ens: Record<Address, string>,
         namesAndSymbolsMap: NamesAndSymbolsMap,
         officialContractNamesMap: Record<Address, string>,

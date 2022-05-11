@@ -6,6 +6,6 @@ declare module 'eth-ens-namehash' {
 
 declare module 'abi-decoder' {
     function addABI(abi: any[]): void
-    function decodeLogs(logs: any[]): any[]
-    function decodeMethod(data: string): any
+    function decodeLogs(logs: any[]): Omit<import('core/transformDecodedLogs').RawDecodedLog[], 'logIndex'>
+    function decodeMethod(data: string): import('core/transformDecodedLogs').RawDecodedCallData
 }

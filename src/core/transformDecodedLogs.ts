@@ -17,7 +17,7 @@ type Event = {
     events: Record<string, unknown>
 }
 
-export type DecodedLog = {
+export type RawDecodedLog = {
     name: string
     address: string
     logIndex: number
@@ -28,21 +28,30 @@ export type DecodedLog = {
     }[]
 }
 
-export type DecodedDataAndLogs = {
-    decodedData: {
+export type RawDecodedCallData = {
+    name: string
+    params: {
         name: string
-        params: {
-            name: string
-            type: string
-            value: string | number | boolean | null | string[]
-        }[]
-    }
-    decodedLogs: DecodedLog[]
+        type: string
+        value: string | number | boolean | null | string[]
+    }[]
+}
+
+export type DecodedCallData = {
+    name: string
+    params: Record<string, MostTypes>
+}
+
+export type MostTypes = string | number | boolean | null | string[]
+
+export type DecodedDataAndLogs = {
+    decodedLogs: RawDecodedLog[]
+    decodedData: RawDecodedCallData
 }
 
 export function transformDecodedLogs(
     rawLogs: Log[],
-    decodedLogs: DecodedLog[],
+    decodedLogs: RawDecodedLog[],
     contractDataArr: ContractData[],
 ): Array<Interaction> {
     // tx.log_events.forEach((event) => {
@@ -56,7 +65,7 @@ export function transformDecodedLogs(
         // .reject((event) => !event.sender_name)
 
         .reject((log) => !log)
-        .mapToGroups((log: DecodedLog): [string, Event] => {
+        .mapToGroups((log: RawDecodedLog): [string, Event] => {
             // console.log('params', event.decoded.params)
             const events = Object.fromEntries(
                 log.events?.map((param) => [
@@ -126,4 +135,17 @@ export function transformDecodedLogs(
     // correctContractName(contractData?.contract),
 
     return interactions.values().toArray()
+}
+
+export function transformDecodedData(rawDecodedCallData: RawDecodedCallData): DecodedCallData {
+    const params: Record<string, MostTypes> = {}
+
+    rawDecodedCallData.params.forEach((param) => {
+        params[param.name] = param.value
+    })
+
+    return {
+        name: rawDecodedCallData.name,
+        params,
+    }
 }
