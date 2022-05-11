@@ -117,6 +117,7 @@ export function transformDecodedLogs(
 export function transformDecodedData(rawDecodedCallData: RawDecodedCallData): DecodedCallData {
     const params: Record<string, MostTypes> = {}
 
+    console.log(rawDecodedCallData)
     rawDecodedCallData.params.forEach((param) => {
         params[param.name] = param.value
     })

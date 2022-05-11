@@ -217,7 +217,7 @@ class Translator2 {
         // TODO logs that don't get decoded dont show up as 'null' or 'undefined', which will throw off mapping the logIndex to the decoded log
 
         const rawDecodedLogs = abiDecoder.decodeLogs(rawTxData.txReceipt.logs)
-        const rawDecodedCallData = abiDecoder.decodeMethod(rawTxData.txResponse.data)
+        const rawDecodedCallData = abiDecoder.decodeMethod(rawTxData.txResponse.data) || { name: null, params: [] }
 
         const augmentedDecodedLogs = rawDecodedLogs.map((log, index) => {
             const decodedLog = {

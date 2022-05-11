@@ -315,7 +315,7 @@ export type RawDecodedLog = {
 }
 
 export type RawDecodedCallData = {
-    name: string
+    name: string | null
     params: {
         name: string
         type: string
@@ -324,7 +324,7 @@ export type RawDecodedCallData = {
 }
 
 export type DecodedCallData = {
-    name: string
+    name: string | null
     params: Record<string, MostTypes>
 }
 
