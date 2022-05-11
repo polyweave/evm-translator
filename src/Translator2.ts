@@ -2,13 +2,7 @@ import { AlchemyProvider, JsonRpcProvider } from '@ethersproject/providers'
 import abiDecoder from 'abi-decoder'
 import { Augmenter } from 'core/Augmenter'
 import RawDataFetcher from 'core/RawDataFetcher'
-import {
-    DecodedCallData,
-    DecodedDataAndLogs,
-    RawDecodedLog,
-    transformDecodedData,
-    transformDecodedLogs,
-} from 'core/transformDecodedLogs'
+import { DecodedCallData, RawDecodedLog, transformDecodedData, transformDecodedLogs } from 'core/transformDecodedLogs'
 import {
     Address,
     Chain,

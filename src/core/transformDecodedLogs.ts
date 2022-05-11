@@ -44,11 +44,6 @@ export type DecodedCallData = {
 
 export type MostTypes = string | number | boolean | null | string[]
 
-export type DecodedDataAndLogs = {
-    decodedLogs: RawDecodedLog[]
-    decodedData: RawDecodedCallData
-}
-
 export function transformDecodedLogs(
     rawLogs: Log[],
     decodedLogs: RawDecodedLog[],
