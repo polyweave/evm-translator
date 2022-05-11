@@ -18,6 +18,7 @@ import { ABI_Item, ABI_ItemUnfiltered } from 'interfaces/abi'
 import { EVMTransaction } from 'interfaces/s3'
 import { filterABIs, validateAndNormalizeAddress } from 'utils'
 import Etherscan from 'utils/clients/Etherscan'
+import { DatabaseInterface, NullDatabaseInterface } from 'utils/DatabaseInterface'
 
 export type TranslatorConfigTwo = {
     chain: Chain
@@ -25,6 +26,7 @@ export type TranslatorConfigTwo = {
     alchemyProjectId: string
     etherscanAPIKey: string
     userAddress?: string
+    databaseInterface?: DatabaseInterface
 }
 
 export type NamesAndSymbolsMap = Record<Address, { name: string | null; symbol: string | null }>
@@ -44,6 +46,7 @@ class Translator2 {
     userAddress: Address | null
     augmenter: Augmenter
     interpreter: Interpreter
+    databaseInterface: DatabaseInterface
 
     constructor(config: TranslatorConfigTwo) {
         this.chain = config.chain
@@ -53,8 +56,10 @@ class Translator2 {
         this.userAddress = config.userAddress ? validateAndNormalizeAddress(config.userAddress) : null
         this.provider = this.getProvider()
         this.etherscan = new Etherscan(this.etherscanAPIKey)
+        this.databaseInterface = config.databaseInterface || new NullDatabaseInterface()
+
         this.rawDataFetcher = new RawDataFetcher(this.provider)
-        this.augmenter = new Augmenter(this.provider, null, this.etherscan)
+        this.augmenter = new Augmenter(this.provider, null, this.etherscan, this.databaseInterface)
         this.interpreter = new Interpreter(config.chain)
     }
 
@@ -114,7 +119,7 @@ class Translator2 {
     /****  Data used to decode & augment   ********/
     /**********************************************/
     async getABIsAndNamesForContracts(
-        contractAddresses: string[],
+        contractAddresses: Address[],
     ): Promise<[Record<Address, ABI_ItemUnfiltered[]>, Record<Address, string | null>]> {
         return this.augmenter.getABIsAndNamesForContracts(contractAddresses)
     }
@@ -161,7 +166,7 @@ class Translator2 {
         ABIs: Record<Address, ABI_Item[]>,
         contractDataMap: Record<Address, ContractData>,
     ): { decodedLogs: Interaction[]; decodedCallData: DecodedCallData } {
-        return this.decodeTxData(rawTxData, ABIs, contractDataMap)
+        return this.augmenter.decodeTxData(rawTxData, ABIs, contractDataMap)
     }
 
     decodeTxDataArr(rawTxDataArr: RawTxData[], ABIs: Record<Address, ABI_Item[]>[]): Decoded[] {

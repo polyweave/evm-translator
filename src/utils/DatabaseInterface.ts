@@ -3,13 +3,15 @@ import { Address, ContractData, Decoded, Interpretation } from 'interfaces'
 import { ABI_ItemUnfiltered, ABI_Row } from 'interfaces/abi'
 
 export abstract class DatabaseInterface {
-    connectionString: string
-    constructor(connectionString: string) {
+    connectionString: string | null
+    constructor(connectionString: string | null) {
         this.connectionString = connectionString
     }
 
     abstract getContractDataForContract(contractAddress: Address): Promise<ContractData | null>
-    abstract getContractDataForManyContracts(contractAddresses: Address[]): Promise<Array<ContractData | null> | null>
+    abstract getContractDataForManyContracts(
+        contractAddresses: Address[],
+    ): Promise<Record<Address, ContractData | null>>
 
     abstract addOrUpdateContractData(contractData: ContractData): Promise<void>
     abstract addOrUpdateManyContractData(contractDataArr: ContractData[]): Promise<void>
@@ -43,11 +45,19 @@ export abstract class DatabaseInterface {
 }
 
 export class NullDatabaseInterface extends DatabaseInterface {
+    constructor(connectionString: string | null = null) {
+        super(connectionString)
+    }
+
     async getContractDataForContract(contractAddress: Address): Promise<ContractData | null> {
         return Promise.resolve(null)
     }
-    async getContractDataForManyContracts(contractAddresses: Address[]): Promise<Array<ContractData | null>> {
-        return Promise.resolve([])
+    async getContractDataForManyContracts(contractAddresses: Address[]): Promise<Record<Address, ContractData | null>> {
+        const obj: Record<Address, ContractData | null> = {}
+        for (let i = 0; i < contractAddresses.length; i++) {
+            obj[contractAddresses[i]] = null
+        }
+        return Promise.resolve(obj)
     }
 
     async addOrUpdateContractData(contractData: ContractData): Promise<void> {

@@ -22,7 +22,7 @@ import {
 import { ABI_Item, ABI_ItemUnfiltered } from 'interfaces/abi'
 import { CovalentTxData } from 'interfaces/covalent'
 import traverse from 'traverse'
-import { filterABIs, getChainById, getKeys, isAddress, validateAndNormalizeAddress } from 'utils'
+import { filterABIs, getChainById, getEntries, getKeys, isAddress, validateAndNormalizeAddress } from 'utils'
 import tokenABIMap from 'utils/ABIs'
 import reverseRecordsABI from 'utils/ABIs/ReverseRecords.json'
 import checkInterface from 'utils/checkInterface'
@@ -30,6 +30,7 @@ import Covalent from 'utils/clients/Covalent'
 import Etherscan from 'utils/clients/Etherscan'
 import fourByteDirectory from 'utils/clients/FourByteDirectory'
 import { REVERSE_RECORDS_CONTRACT_ADDRESS } from 'utils/constants'
+import { DatabaseInterface, NullDatabaseInterface } from 'utils/DatabaseInterface'
 import getTypeFromABI from 'utils/getTypeFromABI'
 
 export type DecoderConfig = {
@@ -43,6 +44,9 @@ export class Augmenter {
     provider: BaseProvider
     covalent: Covalent | null
     etherscan: Etherscan
+
+    databaseInterface: DatabaseInterface
+
     formatter = new Formatter()
     chain: Chain
 
@@ -56,10 +60,17 @@ export class Augmenter {
     fnSigCache: Record<string, string> = {}
     ensCache: Record<Address, string> = {}
 
-    constructor(provider: BaseProvider, covalent: Covalent | null, etherscan: Etherscan) {
+    constructor(
+        provider: BaseProvider,
+        covalent: Covalent | null,
+        etherscan: Etherscan,
+        databaseInterface: DatabaseInterface = new NullDatabaseInterface(),
+    ) {
         this.provider = provider
         this.covalent = covalent
         this.etherscan = etherscan
+        this.databaseInterface = databaseInterface
+
         this.chain = getChainById(this.provider.network.chainId)
     }
 
@@ -142,6 +153,8 @@ export class Augmenter {
             // TODO txReceipt.contractAddress is the address of the contract created, add it
             txType = TxType.CONTRACT_INTERACTION
         }
+
+        console.log('contractDataMap', contractDataMap)
 
         const transformedData: Decoded = {
             txHash: txResponse.hash,
@@ -499,11 +512,30 @@ export class Augmenter {
         const contractDataMap: Record<Address, ContractData> = {}
         const filteredABIs = filterABIs(contractToAbiMap)
 
+        const addresses = getKeys(contractToAbiMap)
+
+        const contractDataMapFromDB = await this.databaseInterface.getContractDataForManyContracts(addresses)
+
         await Promise.all(
-            getKeys(contractToAbiMap).map(async (address) => {
+            addresses.map(async (address) => {
                 const abi = contractToAbiMap[address]
-                const contractType = await this.getContractType(address, filteredABIs[address])
-                const { tokenName, tokenSymbol, contractName } = await this.getNameAndSymbol(address, contractType)
+                const contractType =
+                    contractDataMapFromDB[address]?.type || (await this.getContractType(address, filteredABIs[address]))
+
+                let tokenName = null
+                let tokenSymbol = null
+                let contractName = null
+
+                if (contractDataMapFromDB[address]) {
+                    tokenName = contractDataMapFromDB[address]?.tokenName || null
+                    tokenSymbol = contractDataMapFromDB[address]?.tokenSymbol || null
+                    contractName = contractDataMapFromDB[address]?.contractName || null
+                }
+
+                // warning, we might assign contactName from somewhere else in the future, so it might not be null here even when we thought it would be, which means we might still need to get token symbol/name but we end up skipping it
+                if (!contractName) {
+                    ;({ tokenName, tokenSymbol, contractName } = await this.getNameAndSymbol(address, contractType))
+                }
                 // const contractName = await this.getContractName(address)
                 const contractData: ContractData = {
                     address,
@@ -514,6 +546,8 @@ export class Augmenter {
                     contractName,
                     contractOfficialName: contractToOfficialNameMap[address],
                 }
+
+                console.log('contractData', contractData)
                 contractDataMap[address] = contractData
             }),
         )
@@ -522,16 +556,31 @@ export class Augmenter {
 
     // TODO get the names
     async getABIsAndNamesForContracts(
-        contractAddresses: string[],
+        contractAddresses: Address[],
     ): Promise<[Record<Address, ABI_ItemUnfiltered[]>, Record<Address, string | null>]> {
         const addresses = contractAddresses.map((a) => validateAndNormalizeAddress(a))
-        const abiMap = await this.etherscan.getABIs(addresses)
 
-        const nameMap: Record<Address, string | null> = {}
+        const contractDataMap = await this.databaseInterface.getContractDataForManyContracts(addresses)
 
-        getKeys(abiMap).forEach((address) => {
-            nameMap[address] = null
-        })
+        const addressesWithMissingABIs = getKeys(contractDataMap).filter((address) => !contractDataMap[address]?.abi)
+
+        const abiMapFromEtherscan = await this.etherscan.getABIs(addressesWithMissingABIs)
+
+        const AbiMapFromDB = getEntries(contractDataMap).reduce((acc, [address, contractData]) => {
+            acc[address] = contractData?.abi || null
+            return acc
+        }, {} as Record<Address, ABI_ItemUnfiltered[]>)
+
+        const abiMap = { ...AbiMapFromDB, ...abiMapFromEtherscan }
+
+        const nameMapFromDB = getEntries(contractDataMap).reduce((acc, [address, contractData]) => {
+            acc[address] = contractData?.contractOfficialName || null
+            return acc
+        }, {} as Record<Address, string>)
+
+        const nameMapFromEtherscan: Record<Address, string | null> = {}
+
+        const nameMap = { ...nameMapFromDB, ...nameMapFromEtherscan }
 
         return [abiMap, nameMap]
     }
