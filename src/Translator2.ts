@@ -1,6 +1,7 @@
 import { AlchemyProvider, JsonRpcProvider } from '@ethersproject/providers'
 import abiDecoder from 'abi-decoder'
 import { Augmenter } from 'core/Augmenter'
+import Interpreter from 'core/Interpreter'
 import RawDataFetcher from 'core/RawDataFetcher'
 import { transformDecodedData, transformDecodedLogs } from 'core/transformDecodedLogs'
 import {
@@ -46,6 +47,7 @@ class Translator2 {
     etherscan: Etherscan
     userAddress: Address | null
     augmenter: Augmenter
+    interpreter: Interpreter
 
     constructor(config: TranslatorConfigTwo) {
         this.chain = config.chain
@@ -57,6 +59,7 @@ class Translator2 {
         this.etherscan = new Etherscan(this.etherscanAPIKey)
         this.rawDataFetcher = new RawDataFetcher(this.provider)
         this.augmenter = new Augmenter(this.provider, null, this.etherscan)
+        this.interpreter = new Interpreter(config.chain)
     }
 
     private getProvider(): AlchemyProvider {
@@ -224,6 +227,7 @@ class Translator2 {
                 ...log,
                 logIndex: logs[index].logIndex,
                 address: validateAndNormalizeAddress(log.address),
+                decoded: true,
             }
             return decodedLog
         }) as RawDecodedLog[]
@@ -258,7 +262,7 @@ class Translator2 {
     /**********************************************/
 
     interpretDecodedTx(decoded: Decoded, userAddress: Address | null = null): Interpretation {
-        throw new Error('Not implemented')
+        return this.interpreter.interpretSingleTx(decoded, userAddress)
     }
 
     // If we do this after we've created the example description, we'll have to figure out how to parse any addresses we've turned into a shorter name or onoma name

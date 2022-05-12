@@ -110,21 +110,23 @@ export class Augmenter {
         const transformedData: Decoded = {
             txHash: txResponse.hash,
             txType: txType,
-            nativeTokenValueSent: value,
-            nativeTokenSymbol: this.chain.symbol,
-            txIndex: txReceipt.transactionIndex,
-            reverted: txReceipt.status == 0,
-            gasUsed: txReceipt.gasUsed.toString(),
-            effectiveGasPrice: txReceipt.effectiveGasPrice?.toString() || txResponse?.gasPrice?.toString(),
             fromAddress: txReceipt.from,
             toAddress: txReceipt.to,
-            interactions: decodedLogs,
-            contractMethod: decodedCallData.name,
-            contractMethodArguments: decodedCallData.params,
-            contractType: ContractType.OTHER,
             officialContractName: contractDataMap[txReceipt.to].contractOfficialName,
             contractName: contractDataMap[txReceipt.to].contractName,
+            contractType: contractDataMap[txReceipt.to].type,
+            contractMethod: decodedCallData.name,
+            contractMethodArguments: decodedCallData.params,
+            nativeTokenValueSent: value,
+            nativeTokenSymbol: this.chain.symbol,
+            interactions: decodedLogs,
+            effectiveGasPrice: txReceipt.effectiveGasPrice?.toString() || txResponse.gasPrice?.toString() || null,
+            gasUsed: txReceipt.gasUsed.toString(),
             timestamp: txReceipt.timestamp,
+            txIndex: txReceipt.transactionIndex,
+            reverted: txReceipt.status == 0, // will return true if status==undefined
+            fromENS: null,
+            toENS: null,
         }
 
         // TODO augment with trace logs
@@ -150,7 +152,7 @@ export class Augmenter {
                     txType = TxType.CONTRACT_INTERACTION
                 }
 
-                const transformedData = {
+                const transformedData: Decoded = {
                     txHash: txResponse.hash,
                     txType: txType,
                     nativeTokenValueSent: value,
@@ -158,7 +160,8 @@ export class Augmenter {
                     txIndex: txReceipt.transactionIndex,
                     reverted: txReceipt.status == 0,
                     gasUsed: txReceipt.gasUsed.toString(),
-                    effectiveGasPrice: txReceipt.effectiveGasPrice?.toString() || txResponse?.gasPrice?.toString(),
+                    effectiveGasPrice:
+                        txReceipt.effectiveGasPrice?.toString() || txResponse?.gasPrice?.toString() || null,
                     fromAddress: txReceipt.from,
                     toAddress: txReceipt.to,
                     interactions: [],
@@ -168,6 +171,8 @@ export class Augmenter {
                     officialContractName: null,
                     contractName: null,
                     timestamp: txReceipt.timestamp,
+                    fromENS: null,
+                    toENS: null,
                 }
 
                 return transformedData

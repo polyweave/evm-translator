@@ -157,20 +157,20 @@ export type Decoded = {
     contractMethodArguments: Record<string, MostTypes>
     contractName: string | null
     officialContractName: string | null
-    fromENS?: string | null
-    toENS?: string | null
+    fromENS: string | null
+    toENS: string | null
     interactions: Array<Interaction>
     /** The amount of native token (ex: ETH) sent denominated in wei */
     nativeTokenValueSent: string
     /** The symbol for the native token. ex: ETH */
     nativeTokenSymbol: string
-    txIndex?: number
+    txIndex: number
     fromAddress: Address
-    toAddress?: Address
-    reverted?: boolean
+    toAddress: Address | null
+    reverted: boolean
     timestamp: number | null
-    gasUsed?: string
-    effectiveGasPrice?: string
+    gasUsed: string
+    effectiveGasPrice: string | null
 }
 
 export type Interaction = {
@@ -225,8 +225,8 @@ export type UnknownKey = Omit<string, keyof InteractionEvent>
 export type Interpretation = {
     txHash: string
     userAddress: Address
-    contractName?: string | null
-    action?: Action
+    contractName: string | null
+    action: Action
     exampleDescription: string
     tokensSent: Token[] // usually just one token
     tokensReceived: Token[] // usually just one token
@@ -234,9 +234,10 @@ export type Interpretation = {
     nativeTokenValueReceived: string
     nativeTokenSymbol: string
     userName: string
-    counterpartyName?: string // the opposite side of the tx, opposite of userName
+    counterpartyName: string | null // the opposite side of the tx, opposite of userName
     extra: Record<string, any>
-    reverted: boolean
+    /* null when false so we can hide the null columns more easily */
+    reverted: true | null
     gasPaid: string
 }
 
@@ -247,6 +248,7 @@ export type ActivityData = {
 }
 
 export const enum Action {
+    unknown = 'unknown',
     received = 'received',
     sent = 'sent',
     minted = 'minted',
@@ -312,6 +314,7 @@ export type RawDecodedLog = {
         type: string
         value: string | string[]
     }[]
+    decoded: boolean
 }
 
 export type RawDecodedCallData = {
