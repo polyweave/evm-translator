@@ -297,7 +297,7 @@ class Interpreter {
 
         for (const interaction of filteredInteractions) {
             // filter non-transfer events
-            interaction.events = interaction.events.filter((d) => transferEvents.includes(d.eventName))
+            interaction.events = interaction.events.filter((d) => transferEvents.includes(d.eventName || ''))
             // filter out events that aren't to/from the user in the right direction
             interaction.events = interaction.events.filter((d) => toOrFromUser(d, direction, userAddress))
         }
@@ -306,7 +306,7 @@ class Interpreter {
         filteredInteractions = filteredInteractions.filter(
             (i) =>
                 i.events.filter(
-                    (d) => transferEvents.includes(d.eventName), // filters out all non transfer events
+                    (d) => transferEvents.includes(d.eventName || ''), // filters out all non transfer events
                 ).length > 0, // filters out interactions that don't have any events objects left
         )
 

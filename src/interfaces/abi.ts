@@ -1,3 +1,5 @@
+import { AbiInput, AbiItem } from 'web3-utils'
+
 export type ABIStringMap = {
     constructor: string
     event: string[]
@@ -62,10 +64,18 @@ export type ABI_FunctionInput = {
     name: string
     internalType: string
     type: string
+    components?: {
+        name: string
+        type: string
+    }[]
 }
 export type ABI_EventInput = {
     name: string
     internalType: string
     type: string
     indexed: boolean
+    components?: {
+        name: string
+        type: string
+    }[]
 }

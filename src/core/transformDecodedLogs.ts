@@ -21,7 +21,7 @@ type Event = {
     contractName: string | null
     contractSymbol: string | null
     contractAddress: string
-    name: string
+    name: string | null
     logIndex: number
     events: Record<string, unknown>
 }

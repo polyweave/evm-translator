@@ -182,7 +182,7 @@ export type Interaction = {
 
 export type InteractionEvent = {
     /** The name of the function that was called */
-    eventName: string
+    eventName: string | null
     nativeTokenTransfer?: true
     logIndex: number
     params: InteractionEventParams
@@ -305,15 +305,17 @@ export type EthersAPIKeys = {
     }
 }
 
-export type RawDecodedLog = {
+export type RawDecodedLogEvent = {
     name: string
+    type: string
+    value: string | string[]
+}
+
+export type RawDecodedLog = {
+    name: string | null
     address: string
     logIndex: number
-    events: {
-        name: string
-        type: string
-        value: string | string[]
-    }[]
+    events: RawDecodedLogEvent[]
     decoded: boolean
 }
 
