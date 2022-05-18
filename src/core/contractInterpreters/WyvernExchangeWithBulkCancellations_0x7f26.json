@@ -64,7 +64,7 @@
             }
         },
         "incrementNonce": {
-            "action": "incremented nonce",
+            "action": "canceled one or more listings",
             "keywords": {
                 "nonce": {
                     "key": "newNonce",
@@ -75,7 +75,7 @@
                     "defaultValue": "??"
                 }
             },
-            "exampleDescriptionTemplate": "{contractName} {action} of {userName} to {nonce}, invalidating all orders that weren't signed with the original nonce.",
+            "exampleDescriptionTemplate": "{userName} {action} on {contractName} by incrementing nonce to {nonce}.",
             "exampleDescription": "ammar.eth incremented nonce to 77"
         },
         "renounceOwnership": {
@@ -103,14 +103,9 @@
             }
         },
         "cancelOrder_": {
-            "action": "canceled order",
-            "keywords": {
-                "NFT": {
-                    "defaultValue": "an unknown NFT"
-                }
-            },
-            "exampleDescriptionTemplate": "{userName} {action} for {NFT} on {contractName}",
-            "exampleDescription": "ammaralinur.eth canceled order for SmallBrosNFT on OpenSea"
+            "action": "canceled bid",
+            "exampleDescriptionTemplate": "{userName} {action} on {contractName}",
+            "exampleDescription": "ammaralinur.eth canceled bid on OpenSea"
         },
         "atomicMatch_": {
             "action": "bought",
