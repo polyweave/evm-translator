@@ -75,7 +75,7 @@
                     "defaultValue": "??"
                 }
             },
-            "exampleDescriptionTemplate": "{userName} {action} on {contractName} by incrementing nonce to {nonce}.",
+            "exampleDescriptionTemplate": "{userName} {action} on {contractName}.",
             "exampleDescription": "ammar.eth incremented nonce to 77"
         },
         "renounceOwnership": {
