@@ -103,9 +103,10 @@
             }
         },
         "cancelOrder_": {
-            "action": "canceled bid",
+            "action": "canceled a bid",
+            "keywords": {},
             "exampleDescriptionTemplate": "{userName} {action} on {contractName}",
-            "exampleDescription": "ammaralinur.eth canceled bid on OpenSea"
+            "exampleDescription": "ammaralinur.eth canceled a bid on OpenSea"
         },
         "atomicMatch_": {
             "action": "bought",
