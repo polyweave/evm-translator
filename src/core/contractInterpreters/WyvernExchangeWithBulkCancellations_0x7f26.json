@@ -76,7 +76,7 @@
                 }
             },
             "exampleDescriptionTemplate": "{userName} {action} on {contractName}.",
-            "exampleDescription": "ammar.eth incremented nonce to 77"
+            "exampleDescription": "ammar.eth canceled one or more listings on Opensea"
         },
         "renounceOwnership": {
             "action": "______TODO______",
