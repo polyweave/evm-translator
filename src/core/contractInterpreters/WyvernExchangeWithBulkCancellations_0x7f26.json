@@ -64,16 +64,19 @@
             }
         },
         "incrementNonce": {
-            "action": "______TODO______",
-            "exampleDescriptionTemplate": "______TODO______",
-            "exampleDescription": "______TODO______",
+            "action": "incremented nonce",
             "keywords": {
-                "__EXAMPLE_KEYWORD__": {
-                    "key": "______TODO______",
-                    "filters": {},
-                    "defaultValue": "______TODO______"
+                "nonce": {
+                    "key": "newNonce",
+                    "filters": {
+                        "eventName": "NonceIncremented",
+                        "maker": "{userAddress}"
+                    },
+                    "defaultValue": "??"
                 }
-            }
+            },
+            "exampleDescriptionTemplate": "{contractName} {action} of {userName} to {nonce}, invalidating all orders that weren't signed with the original nonce.",
+            "exampleDescription": "ammar.eth incremented nonce to 77"
         },
         "renounceOwnership": {
             "action": "______TODO______",
@@ -100,16 +103,14 @@
             }
         },
         "cancelOrder_": {
-            "action": "______TODO______",
-            "exampleDescriptionTemplate": "______TODO______",
-            "exampleDescription": "______TODO______",
+            "action": "canceled order",
             "keywords": {
-                "__EXAMPLE_KEYWORD__": {
-                    "key": "______TODO______",
-                    "filters": {},
-                    "defaultValue": "______TODO______"
+                "NFT": {
+                    "defaultValue": "an unknown NFT"
                 }
-            }
+            },
+            "exampleDescriptionTemplate": "{userName} {action} for {NFT} on {contractName}",
+            "exampleDescription": "ammaralinur.eth canceled order for SmallBrosNFT on OpenSea"
         },
         "atomicMatch_": {
             "action": "bought",
