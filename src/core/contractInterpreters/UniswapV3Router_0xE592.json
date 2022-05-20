@@ -1,0 +1,249 @@
+{
+    "contractAddress": "0xE592427A0AEce92De3Edee1F18E0157C05861564",
+    "methods": {
+        "0x80fb3ad6": [
+            "exactInput",
+            "exactInput(tuple)"
+        ],
+        "0x5d76b977": [
+            "exactInputSingle",
+            "exactInputSingle(tuple)"
+        ],
+        "0xd42bbb58": [
+            "exactOutput",
+            "exactOutput(tuple)"
+        ],
+        "0x5bd7800f": [
+            "exactOutputSingle",
+            "exactOutputSingle(tuple)"
+        ],
+        "0xac9650d8": [
+            "multicall",
+            "multicall(bytes[])"
+        ],
+        "0x12210e8a": [
+            "refundETH",
+            "refundETH()"
+        ],
+        "0xf3995c67": [
+            "selfPermit",
+            "selfPermit(address,uint256,uint256,uint8,bytes32,bytes32)"
+        ],
+        "0x4659a494": [
+            "selfPermitAllowed",
+            "selfPermitAllowed(address,uint256,uint256,uint8,bytes32,bytes32)"
+        ],
+        "0xa4a78f0c": [
+            "selfPermitAllowedIfNecessary",
+            "selfPermitAllowedIfNecessary(address,uint256,uint256,uint8,bytes32,bytes32)"
+        ],
+        "0xc2e3140a": [
+            "selfPermitIfNecessary",
+            "selfPermitIfNecessary(address,uint256,uint256,uint8,bytes32,bytes32)"
+        ],
+        "0xdf2ab5bb": [
+            "sweepToken",
+            "sweepToken(address,uint256,address)"
+        ],
+        "0xe0e189a0": [
+            "sweepTokenWithFee",
+            "sweepTokenWithFee(address,uint256,address,uint256,address)"
+        ],
+        "0xfa461e33": [
+            "uniswapV3SwapCallback",
+            "uniswapV3SwapCallback(int256,int256,bytes)"
+        ],
+        "0x49404b7c": [
+            "unwrapWETH9",
+            "unwrapWETH9(uint256,address)"
+        ],
+        "0x9b2c0a37": [
+            "unwrapWETH9WithFee",
+            "unwrapWETH9WithFee(uint256,address,uint256,address)"
+        ]
+    },
+    "contractOfficialName": "SwapRouter",
+    "contractName": "______TODO______",
+    "writeFunctions": {
+        "exactInput": {
+            "action": "______TODO______",
+            "exampleDescriptionTemplate": "______TODO______",
+            "exampleDescription": "______TODO______",
+            "keywords": {
+                "__EXAMPLE_KEYWORD__": {
+                    "key": "______TODO______",
+                    "filters": {},
+                    "defaultValue": "______TODO______"
+                }
+            }
+        },
+        "exactInputSingle": {
+            "action": "______TODO______",
+            "exampleDescriptionTemplate": "______TODO______",
+            "exampleDescription": "______TODO______",
+            "keywords": {
+                "__EXAMPLE_KEYWORD__": {
+                    "key": "______TODO______",
+                    "filters": {},
+                    "defaultValue": "______TODO______"
+                }
+            }
+        },
+        "exactOutput": {
+            "action": "______TODO______",
+            "exampleDescriptionTemplate": "______TODO______",
+            "exampleDescription": "______TODO______",
+            "keywords": {
+                "__EXAMPLE_KEYWORD__": {
+                    "key": "______TODO______",
+                    "filters": {},
+                    "defaultValue": "______TODO______"
+                }
+            }
+        },
+        "exactOutputSingle": {
+            "action": "______TODO______",
+            "exampleDescriptionTemplate": "______TODO______",
+            "exampleDescription": "______TODO______",
+            "keywords": {
+                "__EXAMPLE_KEYWORD__": {
+                    "key": "______TODO______",
+                    "filters": {},
+                    "defaultValue": "______TODO______"
+                }
+            }
+        },
+        "multicall": {
+            "action": "______TODO______",
+            "exampleDescriptionTemplate": "______TODO______",
+            "exampleDescription": "______TODO______",
+            "keywords": {
+                "__EXAMPLE_KEYWORD__": {
+                    "key": "______TODO______",
+                    "filters": {},
+                    "defaultValue": "______TODO______"
+                }
+            }
+        },
+        "refundETH": {
+            "action": "______TODO______",
+            "exampleDescriptionTemplate": "______TODO______",
+            "exampleDescription": "______TODO______",
+            "keywords": {
+                "__EXAMPLE_KEYWORD__": {
+                    "key": "______TODO______",
+                    "filters": {},
+                    "defaultValue": "______TODO______"
+                }
+            }
+        },
+        "selfPermit": {
+            "action": "______TODO______",
+            "exampleDescriptionTemplate": "______TODO______",
+            "exampleDescription": "______TODO______",
+            "keywords": {
+                "__EXAMPLE_KEYWORD__": {
+                    "key": "______TODO______",
+                    "filters": {},
+                    "defaultValue": "______TODO______"
+                }
+            }
+        },
+        "selfPermitAllowed": {
+            "action": "______TODO______",
+            "exampleDescriptionTemplate": "______TODO______",
+            "exampleDescription": "______TODO______",
+            "keywords": {
+                "__EXAMPLE_KEYWORD__": {
+                    "key": "______TODO______",
+                    "filters": {},
+                    "defaultValue": "______TODO______"
+                }
+            }
+        },
+        "selfPermitAllowedIfNecessary": {
+            "action": "______TODO______",
+            "exampleDescriptionTemplate": "______TODO______",
+            "exampleDescription": "______TODO______",
+            "keywords": {
+                "__EXAMPLE_KEYWORD__": {
+                    "key": "______TODO______",
+                    "filters": {},
+                    "defaultValue": "______TODO______"
+                }
+            }
+        },
+        "selfPermitIfNecessary": {
+            "action": "______TODO______",
+            "exampleDescriptionTemplate": "______TODO______",
+            "exampleDescription": "______TODO______",
+            "keywords": {
+                "__EXAMPLE_KEYWORD__": {
+                    "key": "______TODO______",
+                    "filters": {},
+                    "defaultValue": "______TODO______"
+                }
+            }
+        },
+        "sweepToken": {
+            "action": "______TODO______",
+            "exampleDescriptionTemplate": "______TODO______",
+            "exampleDescription": "______TODO______",
+            "keywords": {
+                "__EXAMPLE_KEYWORD__": {
+                    "key": "______TODO______",
+                    "filters": {},
+                    "defaultValue": "______TODO______"
+                }
+            }
+        },
+        "sweepTokenWithFee": {
+            "action": "______TODO______",
+            "exampleDescriptionTemplate": "______TODO______",
+            "exampleDescription": "______TODO______",
+            "keywords": {
+                "__EXAMPLE_KEYWORD__": {
+                    "key": "______TODO______",
+                    "filters": {},
+                    "defaultValue": "______TODO______"
+                }
+            }
+        },
+        "uniswapV3SwapCallback": {
+            "action": "______TODO______",
+            "exampleDescriptionTemplate": "______TODO______",
+            "exampleDescription": "______TODO______",
+            "keywords": {
+                "__EXAMPLE_KEYWORD__": {
+                    "key": "______TODO______",
+                    "filters": {},
+                    "defaultValue": "______TODO______"
+                }
+            }
+        },
+        "unwrapWETH9": {
+            "action": "______TODO______",
+            "exampleDescriptionTemplate": "______TODO______",
+            "exampleDescription": "______TODO______",
+            "keywords": {
+                "__EXAMPLE_KEYWORD__": {
+                    "key": "______TODO______",
+                    "filters": {},
+                    "defaultValue": "______TODO______"
+                }
+            }
+        },
+        "unwrapWETH9WithFee": {
+            "action": "______TODO______",
+            "exampleDescriptionTemplate": "______TODO______",
+            "exampleDescription": "______TODO______",
+            "keywords": {
+                "__EXAMPLE_KEYWORD__": {
+                    "key": "______TODO______",
+                    "filters": {},
+                    "defaultValue": "______TODO______"
+                }
+            }
+        }
+    }
+}
