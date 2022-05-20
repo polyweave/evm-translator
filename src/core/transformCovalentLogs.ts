@@ -1,12 +1,9 @@
 import collect from 'collect.js'
 import { ethers } from 'ethers'
 import { BigNumber } from 'ethers'
+
 import { Interaction } from 'interfaces'
 import { CovalentLogEvent, CovalentTxData } from 'interfaces/covalent'
-import { validateAndNormalizeAddress } from 'utils'
-
-// import { PrismaClient } from '@prisma/client'
-// const prisma = new PrismaClient()
 
 type Event = {
     contractName: string
@@ -86,7 +83,7 @@ export function transformCovalentEvents(tx: CovalentTxData): Array<Interaction> 
             return {
                 contractName: event.contractName,
                 contractSymbol: event.contractSymbol,
-                contractAddress: validateAndNormalizeAddress(event.contractAddress),
+                contractAddress: event.contractAddress,
                 events: events.map((event: Event) => ({
                     eventName: event.name,
                     logIndex: event.logIndex,

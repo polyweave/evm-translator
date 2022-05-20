@@ -1,14 +1,15 @@
-import { ActivityData, Address, Chain, Decoded, Interpretation, TokenType } from 'interfaces'
+import { ActivityData, Chain, Decoded, Interpretation, TokenType } from 'interfaces'
 import { ZenLedgerRowType as RowType, ZenLedgerRow } from 'interfaces/zenLedger'
+
 import { chains } from 'utils'
 
 class TaxFormatter {
-    walletAddress: Address
+    walletAddress: string
     walletName: string
     chain: Chain
     rows: ZenLedgerRow[] = []
 
-    constructor(walletAddress: Address, walletName: string, chain: Chain = chains.ethereum) {
+    constructor(walletAddress: string, walletName: string, chain: Chain = chains.ethereum) {
         this.walletAddress = walletAddress
         this.walletName = walletName
         this.chain = chain
@@ -32,7 +33,7 @@ class TaxFormatter {
         const getType = (data: Interpretation, decodedData: Decoded): RowType | null => {
             let rowType = null
 
-            // console.log('method:', decodedData.contractMethod, 'tokens received', interpretedData.tokensReceived)
+            // console.log('method:', decodedData.methodCall.name, 'tokens received', interpretedData.tokensReceived)
 
             const receivedSomething = data.tokensReceived.length > 0 // dont know how to get if you received eth
             const receivedNothing = data.tokensReceived.length === 0 // dont know how to get if you received eth
@@ -41,7 +42,7 @@ class TaxFormatter {
 
             if (receivedNothing && sentNothing) {
                 rowType = RowType.fee
-            } else if (decodedData.contractMethod === 'mint') {
+            } else if (decodedData.methodCall.name === 'mint') {
                 rowType = RowType.nft_mint
             } else if (receivedSomething && data.tokensSent[0]?.symbol === 'USDC') {
                 rowType = RowType.buy
@@ -120,7 +121,7 @@ class TaxFormatter {
             Type: getType(interpretedData, decodedData),
             inType: inType,
             outType: outType,
-            method: decodedData.contractMethod || 'UNKNOWN',
+            method: decodedData.methodCall.name || 'UNKNOWN',
             contract: interpretedData.contractName || 'UNKNOWN',
             'In Amount': inAmount,
             'In Currency': inCurrency,
@@ -139,7 +140,7 @@ class TaxFormatter {
             lpRelated:
                 interpretedData.tokensReceived.length > 1 || interpretedData.tokensSent.length > 1 ? 'true' : 'false',
             // reviewed: null,
-            toAddress: decodedData.toAddress as Address | null,
+            toAddress: decodedData.toAddress || null,
         }
 
         this.rows.push(row)

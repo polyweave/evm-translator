@@ -1,13 +1,16 @@
 import { AlchemyProvider, BaseProvider, getDefaultProvider } from '@ethersproject/providers'
+
+import { ActivityData, Chain, EthersAPIKeys } from 'interfaces'
+import { ActivityDataWthZenLedger, ZenLedgerRow } from 'interfaces/zenLedger'
+
+import { chains, cleanseDataInPlace } from 'utils'
+import Covalent from 'utils/clients/Covalent'
+import Etherscan from 'utils/clients/Etherscan'
+
 import { Augmenter } from 'core/Augmenter'
 import Interpreter from 'core/Interpreter'
 import RawDataFetcher from 'core/RawDataFetcher'
 import TaxFormatter from 'core/TaxFormatter'
-import { ActivityData, Address, Chain, EthersAPIKeys } from 'interfaces'
-import { ActivityDataWthZenLedger, ZenLedgerRow } from 'interfaces/zenLedger'
-import { chains, cleanseDataInPlace } from 'utils'
-import Covalent from 'utils/clients/Covalent'
-import Etherscan from 'utils/clients/Etherscan'
 
 // export const defaultMainnetProvider = getDefaultProvider('homestead', ethersApiKeys)
 
@@ -55,7 +58,7 @@ class Translator {
         this.augmenter = new Augmenter(this.provider, this.covalent, this.etherscan)
     }
 
-    public async translateFromHash(txHash: string, userAddress = null as Address | null): Promise<ActivityData> {
+    public async translateFromHash(txHash: string, userAddress: string | null = null): Promise<ActivityData> {
         try {
             /*
             step 1 (parallelize)
@@ -98,12 +101,12 @@ class Translator {
     }
 
     public async translateFromAddress(
-        addressUnclean: Address,
+        addressUnclean: string,
         includeInitiatedTxs = true,
         includeNotInitiatedTxs = false,
         limit = 100,
     ): Promise<ActivityData[] | ActivityDataWthZenLedger[]> {
-        const address = addressUnclean.toLowerCase() as Address
+        const address = addressUnclean.toLowerCase()
 
         console.log('address we made it', address)
 
@@ -142,13 +145,13 @@ class Translator {
     }
 
     public async translateWithTaxData(
-        addressUnclean: Address,
+        addressUnclean: string,
         includeInitiatedTxs = true,
         includeNotInitiatedTxs = false,
         limit = 100,
     ): Promise<ZenLedgerRow[]> {
         try {
-            const address = addressUnclean.toLowerCase() as Address
+            const address = addressUnclean.toLowerCase()
 
             const allData = await this.translateFromAddress(address, includeInitiatedTxs, includeNotInitiatedTxs, limit)
 
