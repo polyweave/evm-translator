@@ -1,0 +1,491 @@
+{
+    "contractAddress": "0xd9e1cE17f2641f24aE83637ab66a2cca9C378B9F",
+    "methods": {
+        "0xe8e33700": "addLiquidity(address,address,uint256,uint256,uint256,uint256,address,uint256)",
+        "0xf305d719": "addLiquidityETH(address,uint256,uint256,uint256,address,uint256)",
+        "0xbaa2abde": "removeLiquidity(address,address,uint256,uint256,uint256,address,uint256)",
+        "0x02751cec": "removeLiquidityETH(address,uint256,uint256,uint256,address,uint256)",
+        "0xaf2979eb": "removeLiquidityETHSupportingFeeOnTransferTokens(address,uint256,uint256,uint256,address,uint256)",
+        "0xded9382a": "removeLiquidityETHWithPermit(address,uint256,uint256,uint256,address,uint256,bool,uint8,bytes32,bytes32)",
+        "0x5b0d5984": "removeLiquidityETHWithPermitSupportingFeeOnTransferTokens(address,uint256,uint256,uint256,address,uint256,bool,uint8,bytes32,bytes32)",
+        "0x2195995c": "removeLiquidityWithPermit(address,address,uint256,uint256,uint256,address,uint256,bool,uint8,bytes32,bytes32)",
+        "0xfb3bdb41": "swapETHForExactTokens(uint256,address[],address,uint256)",
+        "0x7ff36ab5": "swapExactETHForTokens(uint256,address[],address,uint256)",
+        "0xb6f9de95": "swapExactETHForTokensSupportingFeeOnTransferTokens(uint256,address[],address,uint256)",
+        "0x18cbafe5": "swapExactTokensForETH(uint256,uint256,address[],address,uint256)",
+        "0x791ac947": "swapExactTokensForETHSupportingFeeOnTransferTokens(uint256,uint256,address[],address,uint256)",
+        "0x38ed1739": "swapExactTokensForTokens(uint256,uint256,address[],address,uint256)",
+        "0x5c11d795": "swapExactTokensForTokensSupportingFeeOnTransferTokens(uint256,uint256,address[],address,uint256)",
+        "0x4a25d94a": "swapTokensForExactETH(uint256,uint256,address[],address,uint256)",
+        "0x8803dbee": "swapTokensForExactTokens(uint256,uint256,address[],address,uint256)"
+    },
+    "contractOfficialName": "UniswapV2Router02",
+    "contractName": "Sushiswap",
+    "writeFunctions": {
+        "addLiquidity": {
+            "exampleDescriptionTemplate": "{userName} added liquidity to the {token_0}-{token_1} {contractName} pool",
+            "exampleDescription": "0xf1a9 added liquidity to the SUPER-WETH Sushiswap pool",
+            "action": "added liquidity",
+            "keywords": {
+                "token_0": {
+                    "key": "contractSymbol",
+                    "filters": {
+                        "eventName": "Transfer",
+                        "from": "{userAddress}"
+                    },
+                    "defaultValue": "unknown"
+                },
+                "token_1": {
+                    "key": "contractSymbol",
+                    "filters": {
+                        "eventName": "Transfer",
+                        "from": "{userAddress}"
+                    },
+                    "index": 1,
+                    "defaultValue": "unknown"
+                }
+            }
+        },
+        "addLiquidityETH": {
+            "action": "added liquidity",
+            "exampleDescriptionTemplate": "{userName} {action} to the {token_0}-{chainSymbol} {contractName} pool",
+            "exampleDescription": "0xf1a9 added liquidity to the ACYC-ETH Sushiswap pool",
+            "keywords": {
+                "token_0": {
+                    "key": "contractSymbol",
+                    "filters": {
+                        "eventName": "Transfer",
+                        "from": "{userAddress}"
+                    },
+                    "defaultValue": "unknown"
+                }
+            }
+        },
+        "removeLiquidity": {
+            "action": "removed liquidity",
+            "exampleDescriptionTemplate": "{userName} {action} from the {token_0}-{token_1} {contractName} pool",
+            "exampleDescription": "0xf1a9 removed liquidity from the SUPER-WETH Sushiswap pool",
+            "keywords": {
+                "token_0": {
+                    "key": "contractSymbol",
+                    "filters": {
+                        "eventName": "Transfer",
+                        "to": "{userAddress}"
+                    },
+                    "defaultValue": "unknown"
+                },
+                "token_1": {
+                    "key": "contractSymbol",
+                    "filters": {
+                        "eventName": "Transfer",
+                        "to": "{userAddress}"
+                    },
+                    "index": 1,
+                    "defaultValue": "unknown"
+                }
+            }
+        },
+        "removeLiquidityETH": {
+            "action": "removed liquidity",
+            "exampleDescriptionTemplate": "{userName} {action} from the {token_0}-{chainSymbol} {contractName} pool",
+            "exampleDescription": "0xf1a9 removed liquidity from the ACYC-ETH Sushiswap pool",
+            "keywords": {
+                "token_0": {
+                    "key": "contractSymbol",
+                    "filters": {
+                        "eventName": "Transfer",
+                        "to": "{userAddress}"
+                    },
+                    "defaultValue": "unknown"
+                },
+                "ethValueReceived": {
+                    "key": "value",
+                    "filters": {
+                        "contractAddress": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+                        "eventName": "Transfer",
+                        "to": "{contractAddress}"
+                    },
+                    "defaultValue": "an unknown amount of"
+                }
+            }
+        },
+        "removeLiquidityETHSupportingFeeOnTransferTokens": {
+            "action": "removed liquidity",
+            "exampleDescriptionTemplate": "{userName} {action} from the {token_0}-{chainSymbol} {contractName} pool",
+            "exampleDescription": "0xf1a9 removed liquidity from the ACYC-ETH Sushiswap pool",
+            "keywords": {
+                "token_0": {
+                    "key": "contractSymbol",
+                    "filters": {
+                        "eventName": "Transfer",
+                        "to": "{userAddress}"
+                    },
+                    "defaultValue": "unknown"
+                },
+                "ethValueReceived": {
+                    "key": "value",
+                    "filters": {
+                        "contractAddress": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+                        "eventName": "Transfer",
+                        "to": "{contractAddress}"
+                    },
+                    "defaultValue": "an unknown amount of"
+                }
+            }
+        },
+        "removeLiquidityETHWithPermit": {
+            "action": "removed liquidity",
+            "exampleDescriptionTemplate": "{userName} {action} from the {token_0}-{chainSymbol} {contractName} pool",
+            "exampleDescription": "0xf1a9 removed liquidity from the ACYC-ETH Sushiswap pool",
+            "keywords": {
+                "token_0": {
+                    "key": "contractSymbol",
+                    "filters": {
+                        "eventName": "Transfer",
+                        "to": "{userAddress}"
+                    },
+                    "defaultValue": "unknown"
+                },
+                "ethValueReceived": {
+                    "key": "value",
+                    "filters": {
+                        "contractAddress": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+                        "eventName": "Transfer",
+                        "to": "{contractAddress}"
+                    },
+                    "defaultValue": "an unknown amount of"
+                }
+            }
+        },
+        "removeLiquidityETHWithPermitSupportingFeeOnTransferTokens": {
+            "action": "removed liquidity",
+            "exampleDescriptionTemplate": "{userName} {action} from the {token_0}-{chainSymbol} {contractName} pool",
+            "exampleDescription": "0xf1a9 removed liquidity from the ACYC-ETH Sushiswap pool",
+            "keywords": {
+                "token_0": {
+                    "key": "contractSymbol",
+                    "filters": {
+                        "eventName": "Transfer",
+                        "to": "{userAddress}"
+                    },
+                    "defaultValue": "unknown"
+                },
+                "ethValueReceived": {
+                    "key": "value",
+                    "filters": {
+                        "contractAddress": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+                        "eventName": "Transfer",
+                        "to": "{contractAddress}"
+                    },
+                    "defaultValue": "an unknown amount of"
+                }
+            }
+        },
+        "removeLiquidityWithPermit": {
+            "action": "removed liquidity",
+            "exampleDescriptionTemplate": "{userName} {action} from the {token_0}-{token_1} {contractName} pool",
+            "exampleDescription": "0xf1a9 removed liquidity from the SUPER-WETH Sushiswap pool",
+            "keywords": {
+                "token_0": {
+                    "key": "contractSymbol",
+                    "filters": {
+                        "eventName": "Transfer",
+                        "to": "{userAddress}"
+                    },
+                    "defaultValue": "unknown"
+                },
+                "token_1": {
+                    "key": "contractSymbol",
+                    "filters": {
+                        "eventName": "Transfer",
+                        "to": "{userAddress}"
+                    },
+                    "index": 1,
+                    "defaultValue": "unknown"
+                }
+            }
+        },
+        "swapETHForExactTokens": {
+            "action": "bought",
+            "exampleDescriptionTemplate": "{userName} {action} {nativeValueSent} {chainSymbol} of {tokenName} on {contractName}",
+            "exampleDescription": "0x4f1a9 bought 0.01 ETH of SUPER on Sushiswap",
+            "keywords": {
+                "tokenName": {
+                    "key": "contractSymbol",
+                    "filters": {
+                        "eventName": "Transfer",
+                        "to": "{userAddress}"
+                    },
+                    "defaultValue": "an unknown token"
+                },
+                "tokenAmount": {
+                    "key": "value",
+                    "filters": {
+                        "eventName": "Transfer",
+                        "to": "{userAddress}"
+                    },
+                    "defaultValue": "an unknown amount"
+                }
+            }
+        },
+        "swapExactETHForTokens": {
+            "action": "bought",
+            "exampleDescriptionTemplate": "{userName} {action} {nativeValueSent} {chainSymbol} of {tokenName} on {contractName}",
+            "exampleDescription": "0x4f1a9 bought 0.01 ETH of SUPER on Sushiswap",
+            "keywords": {
+                "tokenName": {
+                    "key": "contractSymbol",
+                    "filters": {
+                        "eventName": "Transfer",
+                        "to": "{userAddress}"
+                    },
+                    "defaultValue": "an unknown token"
+                },
+                "tokenAmount": {
+                    "key": "value",
+                    "filters": {
+                        "eventName": "Transfer",
+                        "to": "{userAddress}"
+                    },
+                    "defaultValue": "an unknown amount"
+                }
+            }
+        },
+        "swapExactETHForTokensSupportingFeeOnTransferTokens": {
+            "action": "bought",
+            "exampleDescriptionTemplate": "{userName} {action} {nativeValueSent} {chainSymbol} of {tokenName} on {contractName}",
+            "exampleDescription": "0x4f1a9 bought 0.01 ETH of SUPER on Sushiswap",
+            "keywords": {
+                "tokenName": {
+                    "key": "contractSymbol",
+                    "filters": {
+                        "eventName": "Transfer",
+                        "to": "{userAddress}"
+                    },
+                    "defaultValue": "an unknown token"
+                },
+                "tokenAmount": {
+                    "key": "value",
+                    "filters": {
+                        "eventName": "Transfer",
+                        "to": "{userAddress}"
+                    },
+                    "defaultValue": "an unknown amount"
+                }
+            }
+        },
+        "swapExactTokensForETH": {
+            "action": "sold",
+            "exampleDescriptionTemplate": "{userName} {action} {ethValueReceived} {chainSymbol} of {tokenName} on {contractName}",
+            "exampleDescription": "0x4f1a9 sold 0.01 ETH of SUPER on Sushiswap",
+            "keywords": {
+                "tokenName": {
+                    "key": "contractSymbol",
+                    "filters": {
+                        "eventName": "Transfer",
+                        "from": "{userAddress}"
+                    },
+                    "defaultValue": "an unknown token"
+                },
+                "tokenAmount": {
+                    "key": "value",
+                    "filters": {
+                        "eventName": "Transfer",
+                        "from": "{userAddress}"
+                    },
+                    "defaultValue": "an unknown amount"
+                },
+                "ethValueReceived": {
+                    "key": "value",
+                    "filters": {
+                        "contractAddress": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+                        "eventName": "Transfer",
+                        "to": "{contractAddress}"
+                    },
+                    "defaultValue": "an unknown amount of"
+                }
+            }
+        },
+        "swapExactTokensForETHSupportingFeeOnTransferTokens": {
+            "action": "sold",
+            "exampleDescriptionTemplate": "{userName} {action} {ethValueReceived} {chainSymbol} of {tokenName} on {contractName}",
+            "exampleDescription": "0x4f1a9 sold 0.01 ETH of SUPER on Sushiswap",
+            "keywords": {
+                "tokenName": {
+                    "key": "contractSymbol",
+                    "filters": {
+                        "eventName": "Transfer",
+                        "from": "{userAddress}"
+                    },
+                    "defaultValue": "an unknown token"
+                },
+                "tokenAmount": {
+                    "key": "value",
+                    "filters": {
+                        "eventName": "Transfer",
+                        "from": "{userAddress}"
+                    },
+                    "defaultValue": "an unknown amount"
+                },
+                "ethValueReceived": {
+                    "key": "value",
+                    "filters": {
+                        "contractAddress": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+                        "eventName": "Transfer",
+                        "to": "{contractAddress}"
+                    },
+                    "defaultValue": "an unknown amount of"
+                }
+            }
+        },
+        "swapExactTokensForTokens": {
+            "action": "swapped",
+            "exampleDescriptionTemplate": "{userName} {action} {tokenAmount0} {tokenName0} for {tokenAmount1} {tokenName1} on {contractName}",
+            "exampleDescription": "0x4f1a9 swapped 246 DAI for 247 USDC on Sushiswap",
+            "keywords": {
+                "tokenName0": {
+                    "key": "contractSymbol",
+                    "filters": {
+                        "eventName": "Transfer",
+                        "from": "{userAddress}"
+                    },
+                    "defaultValue": "an unknown token"
+                },
+                "tokenAmount0": {
+                    "key": "value",
+                    "filters": {
+                        "eventName": "Transfer",
+                        "from": "{userAddress}"
+                    },
+                    "defaultValue": "an unknown amount"
+                },
+                "tokenName1": {
+                    "key": "contractSymbol",
+                    "filters": {
+                        "eventName": "Transfer",
+                        "to": "{userAddress}"
+                    },
+                    "defaultValue": "an unknown token"
+                },
+                "tokenAmount1": {
+                    "key": "value",
+                    "filters": {
+                        "eventName": "Transfer",
+                        "to": "{userAddress}"
+                    },
+                    "defaultValue": "an unknown amount"
+                }
+            }
+        },
+        "swapExactTokensForTokensSupportingFeeOnTransferTokens": {
+            "action": "swapped",
+            "exampleDescriptionTemplate": "{userName} {action} {tokenAmount0} {tokenName0} for {tokenAmount1} {tokenName1} on {contractName}",
+            "exampleDescription": "0x4f1a9 swapped 246 DAI for 247 USDC on Sushiswap",
+            "keywords": {
+                "tokenName0": {
+                    "key": "contractSymbol",
+                    "filters": {
+                        "eventName": "Transfer",
+                        "from": "{userAddress}"
+                    },
+                    "defaultValue": "an unknown token"
+                },
+                "tokenAmount0": {
+                    "key": "value",
+                    "filters": {
+                        "eventName": "Transfer",
+                        "from": "{userAddress}"
+                    },
+                    "defaultValue": "an unknown amount"
+                },
+                "tokenName1": {
+                    "key": "contractSymbol",
+                    "filters": {
+                        "eventName": "Transfer",
+                        "to": "{userAddress}"
+                    },
+                    "defaultValue": "an unknown token"
+                },
+                "tokenAmount1": {
+                    "key": "value",
+                    "filters": {
+                        "eventName": "Transfer",
+                        "to": "{userAddress}"
+                    },
+                    "defaultValue": "an unknown amount"
+                }
+            }
+        },
+        "swapTokensForExactETH": {
+            "action": "sold",
+            "exampleDescriptionTemplate": "{userName} {action} {ethValueReceived} {chainSymbol} of {tokenName} on {contractName}",
+            "exampleDescription": "0x4f1a9 sold 0.01 ETH of SUPER on Sushiswap",
+            "keywords": {
+                "tokenName": {
+                    "key": "contractSymbol",
+                    "filters": {
+                        "eventName": "Transfer",
+                        "from": "{userAddress}"
+                    },
+                    "defaultValue": "an unknown token"
+                },
+                "tokenAmount": {
+                    "key": "value",
+                    "filters": {
+                        "eventName": "Transfer",
+                        "from": "{userAddress}"
+                    },
+                    "defaultValue": "an unknown amount"
+                },
+                "ethValueReceived": {
+                    "key": "value",
+                    "filters": {
+                        "contractAddress": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+                        "eventName": "Transfer",
+                        "to": "{contractAddress}"
+                    },
+                    "defaultValue": "an unknown amount of"
+                }
+            }
+        },
+        "swapTokensForExactTokens": {
+            "action": "swapped",
+            "exampleDescriptionTemplate": "{userName} {action} {tokenAmount0} {tokenName0} for {tokenAmount1} {tokenName1} on {contractName}",
+            "exampleDescription": "0x4f1a9 swapped 246 DAI for 247 USDC on Sushiswap",
+            "keywords": {
+                "tokenName0": {
+                    "key": "contractSymbol",
+                    "filters": {
+                        "eventName": "Transfer",
+                        "from": "{userAddress}"
+                    },
+                    "defaultValue": "an unknown token"
+                },
+                "tokenAmount0": {
+                    "key": "value",
+                    "filters": {
+                        "eventName": "Transfer",
+                        "from": "{userAddress}"
+                    },
+                    "defaultValue": "an unknown amount"
+                },
+                "tokenName1": {
+                    "key": "contractSymbol",
+                    "filters": {
+                        "eventName": "Transfer",
+                        "to": "{userAddress}"
+                    },
+                    "defaultValue": "an unknown token"
+                },
+                "tokenAmount1": {
+                    "key": "value",
+                    "filters": {
+                        "eventName": "Transfer",
+                        "to": "{userAddress}"
+                    },
+                    "defaultValue": "an unknown amount"
+                }
+            }
+        }
+    }
+}
